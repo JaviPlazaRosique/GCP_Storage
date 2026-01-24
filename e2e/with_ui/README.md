@@ -466,6 +466,36 @@ nohup bash -c 'python3 -m delivery_app.main' > output.log 2>&1 &
 
 If you want to see the logs, run the following command:
 
-```sh
+````sh
 tail -f output.log
-```
+````
+
+## Connect BigQuery to the Cloud Storage. 
+
+Now that we have the parquet file created in our bucket, we will create a external table in BigQuery to access its content. You have to do the following steps: 
+
+1. Go to BigQuery GCP console. 
+
+2. Select the dataset `orders_bronze`.
+
+3. Into the dataset, click on `Create Table`. That will open a configuration page.
+
+4. Put the following configuration (you can see on the following images): 
+
+   - **Source**:
+     - **Create table from**: `Google Cloud Storage`
+     - **Select file from GCS bucket**: You have to browse to find the file. The directory is going to be something like that: `e2e-gcp-storage-<The thing that you put>/raw_data/products_additional_info.parquet`
+   - **Destination**:
+     - **Table**: `raw_additional_products_info`
+     - **Table type**: `External table`
+   - **Schema**:
+     - Click on `Auto detect`
+
+![Source BQ-DL](../.img/image39.png)
+
+![Destination and Schema BQ-DL](../.img/image40.png)
+
+5. Click on `Create table`.
+
+In that moment, you should have all of the cloud architecture. 
+
