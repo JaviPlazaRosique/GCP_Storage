@@ -54,7 +54,7 @@ if __name__ == "__main__":
         handlers=[logging.StreamHandler()],
     )
     logger = logging.getLogger()
-    subscriber = EventsManager(subscription_name="order-events-sub")
+    subscriber = EventsManager(subscription_name="orders-events-sub")
     subscriber.create_subscriber()
     publisher = EventsManager(topic_name="delivery-events")
     publisher.create_publisher()

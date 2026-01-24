@@ -40,7 +40,11 @@ To create the necessary VM image, do the following steps.
    sudo apt-get update
    ````
 
-   4.2. Clone this repository on the VM. To clone the repository you have to use the following command into the VM.
+   4.2. Clone this repository on the VM. To clone the repository you have to use the following commands into the VM.
+
+   ````sh
+   sudo apt-get install git
+   ````
 
    ````sh
    git clone https://github.com/JaviPlazaRosique/GCP_Storage.git
@@ -48,27 +52,27 @@ To create the necessary VM image, do the following steps.
 
    4.3. Install python and the dependencies of the apps on the VM.
 
-       4.3.1. Install python.
+     4.3.1. Install python.
 
-       ````sh
-       sudo apt-get install python3
-       ````
+     ````sh
+     sudo apt-get install python3
+     ````
 
-       4.3.2. Install pip for install the dependencies. 
+     4.3.2. Install pip for install the dependencies. 
 
-       ````sh
-       sudo apt-get install python3-pip
-       ````
+     ````sh
+     sudo apt-get install python3-pip
+     ````
 
-       4.3.3. Install dependencies. To install it, you need to stay on the correct directory. so run the following commands.
+     4.3.3. Install dependencies. To install it, you need to stay on the correct directory. so run the following commands.
 
-       ````sh
-       cd GCP_Storage/e2e/VM
-       ````
+     ````sh
+     cd GCP_Storage/e2e/VM
+     ````
 
-       ````sh
-       pip install --no-cache-dir -r requirements.txt
-       ````
+     ````sh
+     pip install --no-cache-dir -r requirements.txt
+     ````
 
 5. Once you have that step finish, close the window of the terminal. Then stop the Compute Engine instance clicking `Stop` as you can see on the image:
 
@@ -104,10 +108,15 @@ Staying in the page that you can see in the previous image, click on the 3 dots 
      - **Network interface**:
        - Network: `default`
        - Subnetwork: `default IPv4`
+   - In **Security**:
+     - **Identity and API access**:
+       - Change **Access scopes** to `Allow full access to all Cloud APIs`
 
 ![Firewall Configuration CE](../.img/image8.png)
 
 ![Network Interface Configuration CE](../.img/image9.png)
+
+![Security Configuration CE](../.img/image38.png)
 
 Once you do that, you will have the Compute Engine instances. In the VM instances you needs to have something like that:
 
@@ -349,11 +358,33 @@ To deploy the bucket you have to do the following steps.
 
 ![Bucket name in GCP Storage](../.img/image31.png)
 
-## Give permissions to the SA.
+## Give permissions to the Compute Engine SA.
 
 To use the complete architecture, the service account of the Virtual Machines needs permission to do something actions.
 
-To give permissions to the SA you have to go to 
+To give permissions to the SA you have to go to do the following steps.
+
+1. In the GCP console go to `Service Accounts` into `IAM & Admin`. You should see the Compute Engine default service account (You can see it in the following image). The default service account have the next format: 
+
+   - `<Your project number>-compute@developer.gserviceaccount.com` 
+
+![Services accounts in GCP console](../.img/image35.png)
+
+2. Click on the Compute Engine default service account. 
+
+3. Into de service account, go to `permissions`. You should see something like that: 
+
+![Permissions in Compute Engine default service account](../.img/image36.png)
+
+4. Click on `Manage access` and add the following roles (you can see in the following image):
+
+   - `Cloud SQL Client` 
+   - `Storage Object User` 
+   - `Pub/Sub Editor` 
+
+![Assign roles](../.img/image37.png)
+
+5. Click on save
 
 ## Run the Orders APP and the Delivery APP.
 
@@ -380,7 +411,7 @@ If you don't know how to do that go to [Create a VM image](#create-a-vm-image).
 You have to stay into the correct directory. To go into that, you have to run the following command: 
 
 ````sh
-cd GCP_Storage/VM/SQL_BigQuery_Storage/
+cd GCP_Storage/e2e/VM/
 ````
 
 Now you have to set the environment variables. You can do it with the following commands:
@@ -418,5 +449,23 @@ If you don't know how to do that go to [Create a VM image](#create-a-vm-image).
 You have to stay into the correct directory. To go into that, you have to run the following command: 
 
 ````sh
-cd GCP_Storage/VM/SQL_BigQuery_Storage/
+cd GCP_Storage/e2e/VM/
 ````
+
+Now you have to set the environment variables. You can do it with the following commands:
+
+````sh
+export PROJECT_ID=<Your project ID in GCP>
+````
+
+In the terminal, run the following command:
+
+````sh
+nohup bash -c 'python3 -m delivery_app.main' > output.log 2>&1 &
+````
+
+If you want to see the logs, run the following command:
+
+```sh
+tail -f output.log
+```
