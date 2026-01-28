@@ -142,7 +142,7 @@ Once yo do it for both topics, you should see something like these in Pub/Sub to
 
 ![The Pub/Sub topics](../.img/image13.png)
 
-# Deploy Operational database (Cloud SQL)
+## Deploy Operational database (Cloud SQL)
 
 To deploy the Cloud SQL instance, you have to do the following steps.
 
@@ -237,7 +237,7 @@ To deploy a BigQuery datasets, you have to do the following steps.
 
 ![Datasets in BigQuery Studio](../.img/image23.png)
 
-3. Create the datasets clicking on `Create datasets`. Create two, one with `Dataset ID` = `orders_bronze`, and another with `Dataset ID` = `delivery_bronze`.
+3. Create the datasets clicking on `Create datasets`. Create two, one with `Dataset ID` = `orders_bronze`, and another with `Dataset ID` = `delivery_bronze`. And in both, put `Data location` = `europe-west1`
 
 Once you do all, you should see something like that: 
 
@@ -499,3 +499,89 @@ Now that we have the parquet file created in our bucket, we will create a extern
 
 In that moment, you should have all of the cloud architecture. 
 
+# On-Premise part.
+
+To use the this part is you need o have [Anaconda](https://www.anaconda.com/download).
+
+Once you have anaconda, you have to create a python environment with Anaconda. To create that run the following command in your terminal: 
+
+````sh 
+conda create --name e2e_gcp_storage python=3.11
+````
+
+Once you have the environment you have to activate it. To do it run the following command: 
+
+````sh
+conda activate e2e_gcp_storage
+````
+
+Now you have to stay in the directory `on_premise`. Once you are in that directory, run the following command: 
+
+````sh
+pip install -r requirements.txt
+````
+
+**Extra commands**
+
+To deactivate the python environment you have to run the following command: 
+
+````sh 
+conda deactivate
+````
+
+To delete the environment, run the following command: 
+
+````sh
+conda env remove -n e2e-gcp-storage
+````
+## Extract-Load.
+
+To do this part, you have to add your IP to the Cloud SQL instance. You have the instructions in [Run the Orders APP and the Delivery APP](#run-the-orders-app-and-the-delivery-app).
+
+Now you have to deploy the EL pipeline to synchronize the Cloud SQL database with BigQuery. To do that, you have to run the following command (you have to stay in the `on_premise/` directory):
+
+````sh
+POSTGRES_IP=<The public IP of the Cloud SQL instance> GCP_PROJECT=<Your project id> POSTGRES_PASSWORD=<The password of the Cloud SQL> python -m el_orders.main
+````
+
+## DBT.
+
+For this part you have to create the directory `gcp_storage_project/` into the directory `on_premise/dbt/`. 
+
+Into the new directory you have to copy all the files into the directory `template` and change the file `profiles.yml` with your information. 
+
+To use DBT you have to create a service account to bring permission to dbt. To create it you have to do the following steps:
+
+1. Go to IAM & Admin in GCP Console. 
+
+2. Go to Services accounts.
+
+![Services accounts in GCP console](../.img/image41.png)
+
+3. Click on `Create service account`.
+
+4. Set the following configuration (you can see in the following steps): 
+
+   - **Service account name**: `dbt-storage-project`
+   - **Permissions**:
+     - **Role**: `BigQuery Data Owner` and `BigQuery Job User`
+
+![Name Service Account](../.img/image42.png)
+
+![Role service account](../.img/image43.png)
+
+5. Click on `Done`.
+
+Now you have the service account. To use it you have to do the following steps:
+
+1. Click on `Manage keys` into the service account.
+
+![Manage keys service account](../.img/image44.png)
+
+2. Click on `Add key`.
+
+3. Click on `Create new key`.
+
+4. Select `JSON` and click on create. 
+
+Now you have a JSON in your computer. Put it in the directory `on_premise/dbt/gcp_storage_project/`
