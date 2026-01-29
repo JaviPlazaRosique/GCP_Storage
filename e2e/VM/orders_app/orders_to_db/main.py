@@ -145,7 +145,7 @@ if __name__ == "__main__":
     logger = logging.getLogger()
     DB_CONFIG = {
         "dbname": "ecommerce",
-        "user": "postgres",
+        "user": os.getenv("USER_SQL"),
         "password": os.getenv("PASSWORD_SQL"),
         "host": os.getenv("HOST_IP"),
         "port": 5432,

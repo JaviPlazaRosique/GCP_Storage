@@ -534,6 +534,7 @@ To delete the environment, run the following command:
 ````sh
 conda env remove -n e2e-gcp-storage
 ````
+
 ## Extract-Load.
 
 To do this part, you have to add your IP to the Cloud SQL instance. You have the instructions in [Run the Orders APP and the Delivery APP](#run-the-orders-app-and-the-delivery-app).
@@ -584,4 +585,26 @@ Now you have the service account. To use it you have to do the following steps:
 
 4. Select `JSON` and click on create. 
 
-Now you have a JSON in your computer. Put it in the directory `on_premise/dbt/gcp_storage_project/`
+Now you have a JSON in your computer. Put it in the directory `on_premise/dbt/gcp_storage_project/`.
+
+Run the following commands to use dbt:
+
+````sh
+dbt run --select expanded_delivery_events
+dbt run --select analytics
+````
+
+
+## Metabase (BI)
+
+Let's now deploy Metabase to visualize the data from BigQuery.
+
+1. Go to the directory `on_premise/bi/`
+
+2. Deploy the docker-compose running the following command (you need to have the Docker Desktop open):
+
+````sh
+docker compose up
+````
+
+3. Go to the browser and access `http://localhost:3000` to access Metabase.
